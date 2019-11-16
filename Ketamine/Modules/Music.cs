@@ -4,26 +4,26 @@ using Discord.WebSocket;
 using KetamineBot.Services;
 using System.Threading.Tasks;
 using Victoria;
+using System;
+
 
 namespace KetamineBot.Modules
 {
     public class Music : ModuleBase<SocketCommandContext>
     {
-        private MusicService _musicService;
-
         private readonly LavaNode _lavaNode;
+        private readonly MusicService _musicService;
 
-        public Music(LavaNode lavaNode)
+        public Music(LavaNode lavaNode, MusicService musicService)
         {
             _lavaNode = lavaNode;
-        }
-
-        public Music(MusicService musicService)
-        {
             _musicService = musicService;
         }
 
+       
+
         [Command("Join")]
+        [Alias("J")]
         public async Task Join()
         {
             var user = Context.User as SocketGuildUser;
@@ -34,12 +34,31 @@ namespace KetamineBot.Modules
             }
             else
             {
-                await _musicService.InitializeAsync(user.VoiceChannel, Context.Channel as ITextChannel);
+                await _lavaNode.JoinAsync(user.VoiceChannel, Context.Channel as ITextChannel);
                 await ReplyAsync($"now connected to {user.VoiceChannel.Name}");
             }
         }
 
+
+        [Command("Move")]
+        [Alias("M")]
+        public async Task MoveAsync()
+        {
+            var user = Context.User as SocketGuildUser;
+            var player = _lavaNode.GetPlayer(Context.Guild);
+            if (user.VoiceChannel is null)
+            {
+                await ReplyAsync("Please join the channel the bot is in to make it leave.");
+            }
+            else
+            {
+                await _lavaNode.MoveAsync(user.VoiceChannel);
+                await ReplyAsync($"Moved from {player.VoiceChannel} {user.VoiceChannel.Name}");
+            }
+        }
+
         [Command("Leave")]
+        [Alias("L")]
         public async Task Leave()
         {
             var user = Context.User as SocketGuildUser;
@@ -49,21 +68,25 @@ namespace KetamineBot.Modules
             }
             else
             {
-                await _musicService.LeaveAsync(user.VoiceChannel);
+                await _lavaNode.LeaveAsync(user.VoiceChannel);
                 await ReplyAsync($"Bot has now left {user.VoiceChannel.Name}");
             }
         }
+
+
 
         [Command("Play")]
         [Alias("P")]
         public async Task Play([Remainder]string query)
             => await ReplyAsync(await _musicService.PlayAsync(query, Context.Guild));
-        /*
+
+        
         [Command("Queue")]
         [Alias("q")]
         public async Task List()
             => await ReplyAsync("", false, await _musicService.ListAsync(Context.Guild));
-            */
+            
+
         [Command("Stop")]
         [Alias("S")]
         public async Task Stop()

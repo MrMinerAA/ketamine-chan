@@ -11,9 +11,9 @@ namespace KetamineBot
 {
     public class KetamineClient
     {
-        private DiscordSocketClient _client;
-        private CommandService _cmdService;
-        private IServiceProvider _services;
+        private readonly DiscordSocketClient _client;
+        private readonly CommandService _cmdService;
+        private  IServiceProvider _services;
 
         public KetamineClient(DiscordSocketClient client = null, CommandService cmdService = null)
         {
@@ -31,7 +31,7 @@ namespace KetamineBot
 
         public async Task InitializeAsync()
         {
-            await _client.LoginAsync(TokenType.Bot, "NjI4MzQ2NTIzNDUyNzAyNzUw.XcicfA.5Iq6gnlUqEx5QprDIO1UQwSUa8s");
+            await _client.LoginAsync(TokenType.Bot, "NjI4MzQ2NTIzNDUyNzAyNzUw.Xcn7dA.keVe6Zdq4yD7YdQuz4wZCBUrnNo");
             await _client.StartAsync();
             await _client.SetGameAsync("Managing MrMinerAA");
             _client.Log += LogAsync;

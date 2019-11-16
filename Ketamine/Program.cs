@@ -32,8 +32,7 @@ namespace Ketamine
         {
             if (msg.Author.IsBot)
                 return;
-            if (msg.Author.Equals("258938877077618690"))
-                return;
+
             if (msg.Content.StartsWith('~'))
                 return;
             if (msg.Content.StartsWith('.'))
@@ -50,6 +49,8 @@ namespace Ketamine
                 .WithUrl("https://www.webmd.com/depression/features/what-does-ketamine-do-your-brain#1").Build();
             await msg.Channel.SendMessageAsync("", embed: msgEmbed);
         }
+
+
         private Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
