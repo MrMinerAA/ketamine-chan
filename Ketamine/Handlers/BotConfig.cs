@@ -9,4 +9,4 @@ namespace Ayako.DataStructs
         public string GameStatus { get; set; }
         public List<ulong> BlacklistedChannels { get; set; }
     }
-}
+} 
