@@ -1,0 +1,5 @@
+\\AYAKO\Server\ToBeDeleted\KetamineV5\Ketamine\obj\Debug\net5.0\Ketamine.csproj.AssemblyReference.cache
+\\AYAKO\Server\ToBeDeleted\KetamineV5\Ketamine\obj\Debug\net5.0\Ketamine.GeneratedMSBuildEditorConfig.editorconfig
+\\AYAKO\Server\ToBeDeleted\KetamineV5\Ketamine\obj\Debug\net5.0\Ketamine.AssemblyInfoInputs.cache
+\\AYAKO\Server\ToBeDeleted\KetamineV5\Ketamine\obj\Debug\net5.0\Ketamine.AssemblyInfo.cs
+\\AYAKO\Server\ToBeDeleted\KetamineV5\Ketamine\obj\Debug\net5.0\Ketamine.csproj.CoreCompileInputs.cache
