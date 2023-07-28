@@ -1,6 +1,7 @@
 ﻿using Ayako.Services;
 using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Ayako.Modules
         }
 
 
-        [Command("Join")]
+        [SlashCommand("join", "Join a voice channel")]
         public async Task JoinAsync()
         {
             if (_lavaNode.HasPlayer(Context.Guild))
@@ -59,7 +60,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Leave")]
+        [SlashCommand("leave", "Leave the voice channel")]
         public async Task LeaveAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -86,7 +87,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Play")]
+        [SlashCommand("play", "Play a song")]
         public async Task PlayAsync([Remainder] string searchQuery)
         {
             if (string.IsNullOrWhiteSpace(searchQuery))
@@ -144,7 +145,7 @@ namespace Ayako.Modules
             await player.PlayAsync(lavaTrack);
         }
 
-        [Command("Pause")]
+        [SlashCommand("pause", "Pause the currently playing song")]
         public async Task PauseAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -170,7 +171,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Resume")]
+        [SlashCommand("resume", "Resume the currently paused song")]
         public async Task ResumeAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -196,7 +197,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Stop")]
+        [SlashCommand("stop", "Stop the currently playing song")]
         public async Task StopAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -222,7 +223,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Skip")]
+        [SlashCommand("skip", "Skip the currently playing song")]
         public async Task SkipAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -265,7 +266,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Seek")]
+        [SlashCommand("seek", "Seek to a specific position in the currently playing song")]
         public async Task SeekAsync(TimeSpan timeSpan)
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -291,7 +292,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("Volume")]
+        [SlashCommand("volume", "Set the player volume")]
         public async Task VolumeAsync(ushort volume)
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -311,7 +312,7 @@ namespace Ayako.Modules
             }
         }
 
-        [Command("NowPlaying"), Alias("Np")]
+        [SlashCommand("nowplaying", "Show the currently playing song")]
         public async Task NowPlayingAsync()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -338,7 +339,7 @@ namespace Ayako.Modules
             await ReplyAsync(embed: embed.Build());
         }
 
-        [Command("Genius", RunMode = RunMode.Async)]
+        [SlashCommand("genius", "Show the Genius lyrics of the currently playing song")]
         public async Task ShowGeniusLyrics()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -378,7 +379,7 @@ namespace Ayako.Modules
             await ReplyAsync($"```{stringBuilder}```");
         }
 
-        [Command("OVH", RunMode = RunMode.Async)]
+        [SlashCommand("ovh", "Show the OVH lyrics of the currently playing song")]
         public async Task ShowOvhLyrics()
         {
             if (!_lavaNode.TryGetPlayer(Context.Guild, out var player))
@@ -417,7 +418,6 @@ namespace Ayako.Modules
 
             await ReplyAsync($"```{stringBuilder}```");
         }
-
 
 
     }

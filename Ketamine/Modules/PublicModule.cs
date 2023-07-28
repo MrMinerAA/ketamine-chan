@@ -1,22 +1,27 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Interactions;
 using System;
 using System.Threading.Tasks;
 
 namespace Ayako.Modules
 {
-    // Modules must be public and inherit from an IModuleBase
     public class PublicModule : ModuleBase<SocketCommandContext>
     {
-        // Dependency Injection will fill this value in for us
         public static string path = System.IO.Directory.GetCurrentDirectory();
 
-        [Command("random")]
+        [SlashCommand("test", "This is a test command. The bot is working!")]
+        public async Task TestCommand()
+        {
+            await Context.Channel.SendMessageAsync("This is a test command. The bot is working!");
+        }
+
+        [SlashCommand("random", "Get a random response")]
         public async Task RandomCommand()
         {
             string[] responses =
-{
-                "Ha 69, Thats The Sex Number",
+            {
+                "Ha 69, That's The Sex Number",
                 "Ayako",
                 "Black Tar Heroine",
                 "h-hewwo...owunce of weed pwease >///< arigato... dealer-kun puts weedie-chan in bong and inhales waaah!! (╯✧▽✧)╯ daisuki cannabis desu~! (^ ω ^ )uwaaa! weedie-chan i feel so kimochi!!(〃°ω°〃) hehe~ ur deep inside me now x3 weedie-chans drug pussy is so good!",
@@ -30,57 +35,40 @@ namespace Ayako.Modules
             await Context.Channel.SendMessageAsync($"{responses[responseIndex]}");
         }
 
-        [Command("uwu")]
+        [SlashCommand("uwu", "Show information about Ketamine")]
         public async Task UwU()
         {
-            string str = "Ketamine is a medication mainly used for starting and maintaining anesthesia. It induces a trance-like state while providing pain relief, sedation, and memory loss. Other uses include for chronic pain, sedation in intensive care, and depression. Heart function, breathing, and airway reflexes generally remain functional. Effects typically begin within five minutes when given by injection, and last up to about 25 minutes. Common side effects include agitation, confusion, or hallucinations as the medication wears off. Elevated blood pressure and muscle tremors are relatively common. Spasms of the larynx may rarely occur. Ayako is an NMDA receptor antagonist, but it may also have other actions. Ayako was discovered in 1962, first tested in humans in 1964, and was approved for use in the United States in 1970. It was extensively used for surgical anesthesia in the Vietnam War due to its safety. It is on the World Health Organization's List of Essential Medicines, the most effective and safe medicines needed in a health system.[28] It is available as a generic medication. The wholesale price in the developing world is between US$0.84 and US$3.22 per vial. Ayako is also used as a recreational drug for its hallucinogenic and dissociative effects.";
+            string str = "Ketamine is a medication mainly used for starting and maintaining anesthesia. It induces a trance-like state while providing pain relief, sedation, and memory loss. Other uses include for chronic pain, sedation in intensive care, and depression. Heart function, breathing, and airway reflexes generally remain functional. Effects typically begin within five minutes when given by injection, and last up to about 25 minutes. Common side effects include agitation, confusion, or hallucinations as the medication wears off. Elevated blood pressure and muscle tremors are relatively common. Spasms of the larynx may rarely occur. Ketamine is an NMDA receptor antagonist, but it may also have other actions. Ketamine was discovered in 1962, first tested in humans in 1964, and was approved for use in the United States in 1970. It was extensively used for surgical anesthesia in the Vietnam War due to its safety. It is on the World Health Organization's List of Essential Medicines, the most effective and safe medicines needed in a health system. It is available as a generic medication. The wholesale price in the developing world is between US$0.84 and US$3.22 per vial. Ketamine is also used as a recreational drug for its hallucinogenic and dissociative effects.";
 
             Color successColor = new Color(uint.Parse("34eb7d", System.Globalization.NumberStyles.HexNumber));
             Embed msgEmbed = new EmbedBuilder()
-                .WithImageUrl("https://drugabuse.com/wp-content/uploads/drugabuse_shutterstock-153900788-young-girls-snorting-Ayako-off-mirror-with-marked-bills.jpg")
-                .WithTitle("Ketamine").Build();
+                .WithImageUrl("https://drugabuse.com/wp-content/uploads/drugabuse_shutterstock-153900788-young-girls-snorting-ketamine-off-mirror-with-marked-bills.jpg")
+                .WithTitle("Ketamine")
+                .Build();
 
-
-            await Context.Channel.SendMessageAsync("", embed: msgEmbed);
+            await Context.Channel.SendMessageAsync(embed: msgEmbed);
         }
 
-        [Command("h")]
-        [Alias("help")]
+        [SlashCommand("help", "Show the help message")]
+        [Alias("h")]
         public async Task Help()
         {
-
             Embed msgEmbed = new EmbedBuilder()
                 .WithTitle("Help")
-                .WithDescription("Play, Pause, Resume, Stop, Queue, and Leave are a few of my music based commands.")
+                .WithDescription("Play, Pause, Resume, Stop, Queue, and Leave are a few of my music-based commands.")
                 .WithColor(Color.DarkPurple)
-                .WithCurrentTimestamp().Build();
+                .WithCurrentTimestamp()
+                .Build();
 
-
-            await Context.Message.Author.SendMessageAsync("", embed: msgEmbed);
+            await Context.User.SendMessageAsync(embed: msgEmbed);
         }
 
-        [Command("Crazy")]
+        [SlashCommand("crazy", "Share a crazy message")]
         public async Task Crazy()
         {
-            string str = "Crazy ? I was crazy once. They locked me in a room. A rubber room.A rubber room with rats.And rats make me crazy.";
+            string str = "Crazy? I was crazy once. They locked me in a room. A rubber room. A rubber room with rats. And rats make me crazy.";
 
-            await Context.Channel.SendMessageAsync("");
+            await Context.Channel.SendMessageAsync(str);
         }
-
-
     }
 }
-
-
-/*
- *          Color successColor = new Color(uint.Parse("34eb7d", System.Globalization.NumberStyles.HexNumber));
-            Embed msgEmbed = new EmbedBuilder()
-                .WithDescription(str)
-                .WithFooter("footer")
-                .WithColor(successColor)
-                .WithImageUrl("https://link.com/")
-                .WithUrl("https://link.com/")
-                .WithTimestamp(DateTime.Now)
-                .WithThumbnailUrl("https://link.com/")
-                .WithTitle("Title").Build();
- */

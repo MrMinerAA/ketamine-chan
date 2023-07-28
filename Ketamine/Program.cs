@@ -1,12 +1,20 @@
 ﻿using Ayako.Services;
+using System;
 using System.Threading.Tasks;
 
 namespace Ayako
 {
     class Program
     {
-        /* Keep This File Super Simple. (This Method Requires C# 7.2 or Higher!) */
-        private static Task Main()
-            => new DiscordService().InitializeAsync();
+        internal static bool IsDebug()
+        {
+            throw new NotImplementedException();
+        }
+
+        static async Task Main(string[] args)
+        {
+            var discordService = new DiscordService();
+            await discordService.InitializeAsync();
+        }
     }
 }

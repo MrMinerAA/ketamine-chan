@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using Ayako.Modules;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,6 @@ namespace Ayako.Handlers
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
 
-        /* Get Everything we need from DI. */
         public CommandHandler(IServiceProvider services)
         {
             _commands = services.GetRequiredService<CommandService>();
@@ -25,15 +25,18 @@ namespace Ayako.Handlers
             HookEvents();
         }
 
-        /* Initialize the CommandService. */
         public async Task InitializeAsync()
         {
-            await _commands.AddModulesAsync(
-                assembly: Assembly.GetEntryAssembly(),
-                services: _services);
+            // Register the type reader for CommandContext
+            _commands.AddTypeReader<CommandContext>(new CommandContextTypeReader());
+
+            // Register the PublicModule
+            await _commands.AddModuleAsync<PublicModule>(_services);
+
+            // Add modules from the entry assembly
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         }
 
-        /* Hook Command Specific Events. */
         public void HookEvents()
         {
             _commands.CommandExecuted += CommandExecutedAsync;
@@ -42,93 +45,118 @@ namespace Ayako.Handlers
             
         }
 
-        
-
-        /* When a MessageRecived Event triggers from the Client.
-              Handle the message here. */
-        private Task HandleCommandAsync(SocketMessage socketMessage)
+        public async Task RegisterSlashCommandsAsync()
         {
+            var guilds = _client.Guilds;
+            int delayBetweenCommandsMs = 500; // Adjust this value as needed (in milliseconds)
+
+            foreach (var guild in guilds)
+            {
+                foreach (var module in _commands.Modules)
+                {
+                    foreach (var command in module.Commands)
+                    {
+                        var slashCommand = new SlashCommandBuilder()
+                            .WithName(command.Name)
+                            .WithDescription(command.Summary);
+
+                        // Add options to the slash command if needed
+                        // slashCommand.AddOption(...);
+
+                        var createdCommand = await _client.Rest.CreateGuildCommand(slashCommand.Build(), guild.Id);
+
+                        // Logging the command information
+                        if (createdCommand != null)
+                        {
+                            Console.WriteLine($"Registered slash command '{createdCommand.Name}' in guild '{guild.Name}'");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to register slash command '{command.Name}' in guild '{guild.Name}'");
+                        }
+
+                        await Task.Delay(delayBetweenCommandsMs);
+                    }
+                }
+            }
+        }
+
+
+        private async Task HandleCommandAsync(SocketMessage socketMessage)
+        {
+            Console.WriteLine("HandleCommandAsync called");
+
             var argPos = 0;
-            //Check that the message is a valid command, ignore everything we don't care about. (Private message, messages from other Bots, Etc)
-            if (!(socketMessage is SocketUserMessage message) || message.Author.IsBot || message.Author.IsWebhook || message.Channel is IPrivateChannel)
-                return Task.CompletedTask;
+            if (!(socketMessage is SocketUserMessage message) || message.Author.IsBot || message.Author.IsWebhook )
+                return;
 
-            /* Check that the message has our Prefix */
-            if (!message.HasStringPrefix(GlobalData.Config.DefaultPrefix, ref argPos))
-                return Task.CompletedTask;
+            var context = new SocketCommandContext(_client, message);
 
-            /* Create the CommandContext for use in modules. */
-            var context = new SocketCommandContext(_client, socketMessage as SocketUserMessage);
-
-            /* Check if the channel ID that the message was sent from is in our Config - Blacklisted Channels. */
             var blacklistedChannelCheck = from a in GlobalData.Config.BlacklistedChannels
                                           where a == context.Channel.Id
                                           select a;
             var blacklistedChannel = blacklistedChannelCheck.FirstOrDefault();
 
-            /* If the Channel ID is in the list of blacklisted channels. Ignore the command. */
             if (blacklistedChannel == context.Channel.Id)
             {
-                return Task.CompletedTask;
+                return;
             }
             else
             {
-                var result = _commands.ExecuteAsync(context, argPos, _services, MultiMatchHandling.Best);
+                var result = await _commands.ExecuteAsync(context, argPos, _services);
 
-                /* Report any errors if the command didn't execute succesfully. */
-                //if (!result.Result.IsSuccess)
-                //{
-                //    context.Channel.SendMessageAsync(result.Result.ErrorReason);
-                //}
+                if (!result.IsSuccess)
+                {
+                    // Log the error to the console
+                    Console.WriteLine($"Command execution failed: {result.ErrorReason}");
 
-                /* If everything worked fine, command will run. */
-                return result;
+                    // Send an error message to the channel where the command was invoked
+                    var errorMessage = $"Command execution failed: {result.ErrorReason}";
+                    var embed = new EmbedBuilder()
+                        .WithTitle("Command Execution Failed")
+                        .WithDescription(errorMessage)
+                        .WithColor(Color.Red)
+                        .Build();
+                    
+                }
             }
         }
 
-        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        private async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            /* command is unspecified when there was a search failure (command not found); we don't care about these errors */
             if (!command.IsSpecified)
                 return;
 
-            /* the command was succesful, we don't care about this result, unless we want to log that a command succeeded. */
             if (result.IsSuccess)
                 return;
 
-            /* the command failed, let's notify the user that something happened. */
-            await context.Channel.SendMessageAsync($"error: {result}");
+            await context.Channel.SendMessageAsync($"Error: {result.ErrorReason}");
         }
 
-        /*Used whenever we want to log something to the Console. 
-            Todo: Hook in a Custom LoggingService. */
         private Task LogAsync(LogMessage log)
         {
             Console.WriteLine(log.ToString());
-
             return Task.CompletedTask;
         }
 
         public static async Task<Embed> CreateBasicEmbed(string title, string description, Color color)
         {
-            var embed = await Task.Run(() => (new EmbedBuilder()
+            var embed = await Task.Run(() => new EmbedBuilder()
                 .WithTitle(title)
                 .WithDescription(description)
                 .WithColor(color)
-                .WithCurrentTimestamp().Build()));
+                .WithCurrentTimestamp().Build());
             return embed;
         }
 
         public static async Task<Embed> CreateErrorEmbed(string source, string error)
         {
             var embed = await Task.Run(() => new EmbedBuilder()
-                .WithTitle($"ERROR OCCURED FROM - {source}")
+                .WithTitle($"ERROR OCCURRED FROM - {source}")
                 .WithDescription($"**Error Details**: \n{error}")
                 .WithColor(Color.DarkRed)
                 .WithCurrentTimestamp().Build());
             return embed;
         }
-
-
     }
 }

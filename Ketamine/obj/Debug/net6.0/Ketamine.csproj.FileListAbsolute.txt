@@ -239,3 +239,6 @@ C:\Users\dylanb\Documents\KetamineV5\Ketamine\obj\Debug\net6.0\Ketamine.genrunti
 \\AYAKO\Server\KetamineV7\Ketamine\obj\Debug\net6.0\Ketamine.pdb
 \\AYAKO\Server\KetamineV7\Ketamine\obj\Debug\net6.0\Ketamine.genruntimeconfig.cache
 \\AYAKO\Server\KetamineV7\Ketamine\obj\Debug\net6.0\ref\Ketamine.dll
+\\AYAKO\Server\KetamineV7\Ketamine\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+\\AYAKO\Server\KetamineV7\Ketamine\bin\Debug\net6.0\Microsoft.Extensions.Http.dll
+\\AYAKO\Server\KetamineV7\Ketamine\bin\Debug\net6.0\OpenAI_API.dll

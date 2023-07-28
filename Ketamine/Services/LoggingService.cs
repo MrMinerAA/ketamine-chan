@@ -10,23 +10,15 @@ namespace Ayako.Services
         /* The Standard Way Log */
         public static async Task LogAsync(string src, LogSeverity severity, string message, Exception exception = null)
         {
-            if (severity.Equals(null))
-            {
-                severity = LogSeverity.Warning;
-            }
-            await Append($"{GetSeverityString(severity)}", GetConsoleColor(severity));
-            await Append($" [{SourceToString(src)}] ", ConsoleColor.DarkGray);
+            if (severity == LogSeverity.Debug)
+                return;
 
-            if (!string.IsNullOrWhiteSpace(message))
-                await Append($"{message}\n", ConsoleColor.White);
-            else if (exception == null)
+            if (severity == LogSeverity.Error && exception != null)
             {
-                await Append("Uknown Exception. Exception Returned Null.\n", ConsoleColor.DarkRed);
+                message += $"\nException: {exception.Message}\nStack Trace: {exception.StackTrace}";
             }
-            else if (exception.Message == null)
-                await Append($"Unknownk \n{exception.StackTrace}\n", GetConsoleColor(severity));
-            else
-                await Append($"{exception.Message ?? "Unknownk"}\n{exception.StackTrace ?? "Unknown"}\n", GetConsoleColor(severity));
+
+            await Append($"[{DateTime.Now:HH:mm:ss}] [{GetSeverityString(severity)}] [{SourceToString(src)}] {message}\n", GetConsoleColor(severity));
         }
 
         /* The Way To Log Critical Errors*/
@@ -53,23 +45,23 @@ namespace Ayako.Services
             switch (src.ToLower())
             {
                 case "discord":
-                    return "DISCD";
+                    return "DISC";
                 case "victoria":
-                    return "VICTR";
+                    return "VICT";
                 case "audio":
-                    return "AUDIO";
+                    return "AUDI";
                 case "admin":
-                    return "ADMIN";
+                    return "ADMN";
                 case "gateway":
-                    return "GTWAY";
+                    return "GATE";
                 case "blacklist":
-                    return "BLAKL";
+                    return "BLCK";
                 case "lavanode_0_socket":
-                    return "LAVAS";
+                    return "LAVA";
                 case "lavanode_0":
-                    return "LAVA#";
+                    return "LAVA";
                 case "bot":
-                    return "BOTWN";
+                    return "BOT";
                 default:
                     return src;
             }
@@ -85,14 +77,15 @@ namespace Ayako.Services
                 case LogSeverity.Debug:
                     return "DBUG";
                 case LogSeverity.Error:
-                    return "EROR";
+                    return "ERRO";
                 case LogSeverity.Info:
                     return "INFO";
                 case LogSeverity.Verbose:
-                    return "VERB";
+                    return "VRBS";
                 case LogSeverity.Warning:
                     return "WARN";
-                default: return "UNKN";
+                default:
+                    return "UNKN";
             }
         }
 
@@ -104,16 +97,17 @@ namespace Ayako.Services
                 case LogSeverity.Critical:
                     return ConsoleColor.Red;
                 case LogSeverity.Debug:
-                    return ConsoleColor.Magenta;
+                    return ConsoleColor.Cyan;
                 case LogSeverity.Error:
                     return ConsoleColor.DarkRed;
                 case LogSeverity.Info:
                     return ConsoleColor.Green;
                 case LogSeverity.Verbose:
-                    return ConsoleColor.DarkCyan;
+                    return ConsoleColor.Gray;
                 case LogSeverity.Warning:
                     return ConsoleColor.Yellow;
-                default: return ConsoleColor.White;
+                default:
+                    return ConsoleColor.White;
             }
         }
     }
